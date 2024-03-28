@@ -1,17 +1,61 @@
 use std::collections::{HashMap, HashSet};
 use std::ops::{Mul, Sub};
+
+pub fn sum_of_encrypted_int(nums: Vec<i32>) -> i32 {
+    fn encrypt(num: &i32) -> i32 {
+        let digits: Vec<_> = num
+            .to_string()
+            .chars()
+            .map(|char| char.to_digit(10).unwrap() as i32)
+            .collect();
+        let max_digit = *digits.iter().max().unwrap();
+        (0..digits.len()).fold(0, |acc, _| acc * 10 + max_digit)
+    }
+    nums.iter().map(encrypt).sum()
+}
+
+fn encrypt(num: &i32) -> i32 {
+    let mut max_digit = 0;
+    let mut bits = 0;
+    let mut num = *num;
+    while (num > 0) {
+        bits += 1;
+        max_digit = max_digit.max(num % 10);
+        num /= 10;
+    }
+    let mut res = 0;
+    for _ in 0..bits {
+        res = res * 10 + max_digit;
+    }
+    res
+}
+
+pub fn result_array(nums: Vec<i32>) -> Vec<i32> {
+    let mut arr1 = vec![nums[0]];
+    let mut arr2 = vec![nums[1]];
+    for &num in nums.iter().skip(2) {
+        if arr1[arr1.len() - 1] > arr2[arr2.len() - 1] {
+            arr1.push(num);
+        } else {
+            arr2.push(num);
+        }
+    }
+    [arr1, arr2].concat()
+}
+
 pub fn max_operations(nums: Vec<i32>) -> i32 {
     let mut res = 1;
     let sum = nums[0] + nums[1];
-    for i in (2..(nums.len()-2)).step_by(2) {
-        if nums[i] + nums[i+1] == sum {
+    for i in (2..(nums.len() - 2)).step_by(2) {
+        if nums[i] + nums[i + 1] == sum {
             res += 1
         } else {
-            break
+            break;
         }
     }
     res
 }
+
 pub fn min_processing_time(processor_time: Vec<i32>, tasks: Vec<i32>) -> i32 {
     let mut processor_time = processor_time.clone();
     processor_time.sort_by(|a, b| a.cmp(b));
@@ -77,6 +121,7 @@ pub fn modified_matrix(matrix: Vec<Vec<i32>>) -> Vec<Vec<i32>> {
     }
     res
 }
+
 pub fn maximum_triplet_value(nums: Vec<i32>) -> i64 {
     let n = nums.len();
     let mut res = 0;
@@ -350,6 +395,7 @@ fn find_missing_and_repeated_values(grid: Vec<Vec<i32>>) -> Vec<i32> {
 fn has_trailing_zeros(nums: Vec<i32>) -> bool {
     nums.iter().filter(|&num| num & 1 == 0).count() > 1
 }
+
 pub fn minimum_sum(nums: Vec<i32>) -> i32 {
     let n = nums.len();
     let nums: &Vec<i32> = nums.as_ref();
@@ -359,8 +405,6 @@ pub fn minimum_sum(nums: Vec<i32>) -> i32 {
                 .filter_map(move |k| if nums[i] < nums[j] && nums[k] < nums[j] { Some(nums[i] + nums[j] + nums[k]) } else { None })))
         .min().unwrap_or(-1)
 }
-
-
 
 
 #[cfg(test)]
@@ -373,7 +417,8 @@ mod leetcode_tests {
         assert_eq!(count_divisible_substrings(case1.0), case1.1);
         assert_eq!(count_divisible_substrings(case2.0), case2.1);
         assert_eq!(count_divisible_substrings(case3.0), case3.1);
-}
+    }
+
     #[test]
     fn test_min_processing_time() {
         let case1 = (vec![8, 10], vec![2, 2, 3, 1, 8, 7, 4, 5], 16);
